@@ -27,18 +27,14 @@ void main()
 )";
 const char *fragmentShaderSource = R"(
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec4 aColor;
-out vec4 Color; // Varying
+out vec4 FragColor;
+in vec4 Color; // the input variable from the vertex shader (same name and same type)
 
 uniform float uTime;
 
 void main()
 {
-    Color = aColor; // Pass-through
-    vec3 pos = aPos;
-    pos.y += sin((2 * uTime) - pos.x) / 4.0;
-    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
+    FragColor = Color * ((sin(2 * uTime) / 2) + 0.5) ;
 }
 )";
 

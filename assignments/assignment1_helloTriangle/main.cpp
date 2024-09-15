@@ -5,6 +5,7 @@
 #include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include "./../../core/ak/Shader.h"
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
@@ -37,6 +38,9 @@ void main()
     FragColor = Color * ((sin(2 * uTime) / 2) + 0.5) ;
 }
 )";
+
+ak::Shader vertexShader;
+ak::Shader fragmentShader;
 
 int main() {
     printf("Initializing...");

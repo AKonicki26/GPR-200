@@ -10,6 +10,8 @@
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
+// Old Shader Strings
+/*
 const char *vertexShaderSource = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
@@ -39,8 +41,7 @@ void main()
 }
 )";
 
-ak::Shader vertexShader;
-ak::Shader fragmentShader;
+*/
 
 int main() {
     printf("Initializing...");
@@ -61,6 +62,7 @@ int main() {
 
     //Initialization goes here!
     float vertices[] = {
+            // X,       Y,          Z,      R,         G,       B,      A
         -0.5f, -0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0,
         0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0,
         0.0f, 0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0
@@ -73,6 +75,9 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
 
+    // Shader Code (now unneeded)
+
+/*
     int success;
     char infoLog[512];
 
@@ -114,6 +119,8 @@ int main() {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         printf("%s\n", infoLog);
     }
+*/
+    ak::Shader triangleShader("./assets/vertexShader.vert", "./assets/fragShader.frag");
 
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -139,10 +146,9 @@ int main() {
         glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         //Drawing happens here!
-        glUseProgram(shaderProgram);
 
-        int timeLoc = glGetUniformLocation(shaderProgram, "uTime");
-        glUniform1f(timeLoc, time);
+        triangleShader.use();
+        triangleShader.setFloat("uTime", time);
 
         glBindVertexArray(VAO);
 

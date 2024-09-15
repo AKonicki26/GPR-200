@@ -1,9 +1,14 @@
 #version 330 core
-out vec4 FragColor;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec4 aColor;
+out vec4 Color; // Varying
 
-in vec4 Color; // the input variable from the vertex shader (same name and same type)
+uniform float uTime;
 
 void main()
 {
-    FragColor = Color;
+    Color = aColor; // Pass-through
+    vec3 pos = aPos;
+    pos.y += sin((2 * uTime) - pos.x) / 4.0;
+    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
 }

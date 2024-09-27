@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include "./../../core/ak/Shader.h"
+#include "ak/Texture2D.h"
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
@@ -28,11 +29,11 @@ int main() {
 
     // Vertex data
     float vertices[] = {
-            // X,       Y,          Z,      R,         G,       B,      A
-            0.5f, 0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0, // Top Right
-            0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0, // Bottom Right
-            -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0, // Bottom Left
-            -0.5f, 0.5f, 0.0f, 0.0, 1.0, 1.0, 1.0  // Top Left
+            // X,   Y,   Z,    R,  G,   B,    A,   TexX,  TexY
+            0.5f, 0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0, 1.0f, 1.0f,   // Top Right
+            0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0, 1.0f, 0.0f,  // Bottom Right
+            -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0, 0.0f, 0.0f, // Bottom Left
+            -0.5f, 0.5f, 0.0f, 0.0, 1.0, 1.0, 1.0,  0.0f, 1.0f   // Top Left
     };
 
     unsigned int indices[] = {
@@ -58,13 +59,17 @@ int main() {
 
     // Set vertex attributes
     // Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     // Color
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // Texture Coordinates
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(7 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
-    ak::Shader triangleShader("./assets/vertexShader.vert", "./assets/fragShader.frag");
+    ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
+    ak::Texture2D duckTexture("./assets/Textures/container.png", GL_NEAREST, GL_REPEAT);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -79,6 +84,7 @@ int main() {
         triangleShader.use();
         triangleShader.setFloat("uTime", time);
 
+        duckTexture.Bind(0);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);

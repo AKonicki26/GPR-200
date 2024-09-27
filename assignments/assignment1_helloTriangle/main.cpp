@@ -68,7 +68,8 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(7 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
+    ak::Shader characterShader("./assets/Shaders/character.vert", "./assets/Shaders/character.frag");
+    ak::Shader backgroundShader("./assets/Shaders/background.vert", "./assets/Shaders/background.frag");
 
     ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
     brickTexture.Bind(GL_TEXTURE0);
@@ -87,13 +88,11 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         // Drawing happens here!
 
-        triangleShader.use();
-        triangleShader.setFloat("uTime", time);
+        characterShader.use();
+        characterShader.setFloat("uTime", time);
 
-        brickTexture.Bind(GL_TEXTURE0);
-        triangleShader.setInt("texture1", 0);
-        duckTexture.Bind(GL_TEXTURE1);
-        triangleShader.setInt("texture2", 1);
+        duckTexture.Bind(GL_TEXTURE0);
+        characterShader.setInt("_texture", 0);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

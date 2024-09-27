@@ -6,6 +6,7 @@
 
 namespace ak {
     Texture2D::Texture2D(const char *filePath, int filterMode, int wrapMode) {
+        stbi_set_flip_vertically_on_load(true);
         glGenTextures(1, &m_id);
         glBindTexture(GL_TEXTURE_2D, m_id);
 

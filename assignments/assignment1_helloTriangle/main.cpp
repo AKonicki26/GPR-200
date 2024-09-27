@@ -73,8 +73,9 @@ int main() {
 
     ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
     brickTexture.Bind(GL_TEXTURE0);
-    ak::Texture2D duckTexture("./assets/Textures/DuckTexture.png", GL_NEAREST, GL_REPEAT);
+    ak::Texture2D duckTexture("./assets/Textures/DuckTexture.png", GL_LINEAR, GL_REPEAT);
     duckTexture.Bind(GL_TEXTURE1);
+    ak::Texture2D sharkTexture("./assets/Textures/shark.png", GL_LINEAR, GL_REPEAT);
 
     glEnable(GL_BLEND);
 
@@ -88,13 +89,25 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         // Drawing happens here!
 
+        glBindVertexArray(VAO);
+
+        // Draw Background
+        backgroundShader.use();
+        backgroundShader.setFloat("uTime", time);
+
+        brickTexture.Bind(GL_TEXTURE0);
+        backgroundShader.setInt("texture1", 0);
+        sharkTexture.Bind(GL_TEXTURE1);
+        backgroundShader.setInt("texture2", 1);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // Draw Character
         characterShader.use();
         characterShader.setFloat("uTime", time);
 
         duckTexture.Bind(GL_TEXTURE0);
         characterShader.setInt("_texture", 0);
 
-        glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
     }

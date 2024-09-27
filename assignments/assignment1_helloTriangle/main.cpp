@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <math.h>
-
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
@@ -11,84 +10,86 @@ const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
 int main() {
-    printf("Initializing...");
+    printf("Initializing...\n");
     if (!glfwInit()) {
-        printf("GLFW failed to init!");
+        printf("GLFW failed to init!\n");
         return 1;
     }
-    GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Triangle", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Square", NULL, NULL);
     if (window == NULL) {
-        printf("GLFW failed to create window");
+        printf("GLFW failed to create window\n");
         return 1;
     }
     glfwMakeContextCurrent(window);
     if (!gladLoadGL(glfwGetProcAddress)) {
-        printf("GLAD Failed to load GL headers");
+        printf("GLAD failed to load GL headers\n");
         return 1;
     }
 
-    //Initialization goes here!
+    // Vertex data
     float vertices[] = {
             // X,       Y,          Z,      R,         G,       B,      A
-        0.5f, 0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0,
-        0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0,
-        -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0,
-        -0.5f, 0.5f, 0.0f, 0.0, 1.0, 1.0, 1.0
+            0.5f, 0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0, // Top Right
+            0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0, // Bottom Right
+            -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0, // Bottom Left
+            -0.5f, 0.5f, 0.0f, 0.0, 1.0, 1.0, 1.0  // Top Left
     };
 
-    float indices[] = {
+    unsigned int indices[] = {
             0, 1, 3,
             1, 2, 3
     };
 
-    unsigned int VBO;
+    unsigned int VAO, VBO, EBO;
+
+    // Generate and bind VAO
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // Generate and bind VBO
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
 
-    unsigned int EBO;
+    // Generate and bind EBO
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    ak::Shader triangleShader("./assets/vertexShader.vert", "./assets/fragShader.frag");
-
-
-    // Position (XYZ)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *) 0);
+    // Set vertex attributes
+    // Position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-
-    // Color (RGBA)
+    // Color
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    //Render loop
+    ak::Shader triangleShader("./assets/vertexShader.vert", "./assets/fragShader.frag");
+
+    // Render loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         float time = (float)glfwGetTime();
-        //Clear framebuffer
+        // Clear framebuffer
         glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        //Drawing happens here!
+        // Drawing happens here!
 
         triangleShader.use();
         triangleShader.setFloat("uTime", time);
 
         glBindVertexArray(VAO);
-
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
     }
 
-    printf("Shutting down...");
+    // Clean up resources (optional, but good practice)
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
+    printf("Shutting down...\n");
+    glfwTerminate();
     return 0;
 }

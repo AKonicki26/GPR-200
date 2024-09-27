@@ -13,7 +13,8 @@ void main()
     Color = aColor; // Pass-through
     TexCoord = aTexCoord; // Pass-through
     vec3 pos = aPos;
-    pos.y += sin((2 * uTime) - pos.x) / 4.0;
+    pos.y += sin((2 * uTime) - pos.x) / 12.0;
+    pos *= 3; // Scale shader to take up entire background
     gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
 
 }

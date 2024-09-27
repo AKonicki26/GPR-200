@@ -1,123 +1,161 @@
 #include <stdio.h>
 #include <math.h>
+
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include "./../../core/ak/Shader.h"
-#include "ak/Texture2D.h"
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
+// Old Shader Strings
+/*
+const char *vertexShaderSource = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec4 aColor;
+out vec4 Color; // Varying
+
+uniform float uTime;
+
+void main()
+{
+    Color = aColor; // Pass-through
+    vec3 pos = aPos;
+    pos.y += sin((2 * uTime) - pos.x) / 4.0;
+    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
+}
+)";
+const char *fragmentShaderSource = R"(
+#version 330 core
+out vec4 FragColor;
+in vec4 Color; // the input variable from the vertex shader (same name and same type)
+
+uniform float uTime;
+
+void main()
+{
+    FragColor = Color * ((sin(2 * uTime) / 2) + 0.5) ;
+}
+)";
+
+*/
+
 int main() {
-    printf("Initializing...\n");
+    printf("Initializing...");
     if (!glfwInit()) {
-        printf("GLFW failed to init!\n");
+        printf("GLFW failed to init!");
         return 1;
     }
-    GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Square", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Triangle", NULL, NULL);
     if (window == NULL) {
-        printf("GLFW failed to create window\n");
+        printf("GLFW failed to create window");
         return 1;
     }
     glfwMakeContextCurrent(window);
     if (!gladLoadGL(glfwGetProcAddress)) {
-        printf("GLAD failed to load GL headers\n");
+        printf("GLAD Failed to load GL headers");
         return 1;
     }
 
-    // Vertex data
+    //Initialization goes here!
     float vertices[] = {
-            // X,   Y,   Z,    R,  G,   B,    A,   TexX,  TexY
-            0.5f, 0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0, 1.0f, 1.0f,   // Top Right
-            0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0, 1.0f, 0.0f,  // Bottom Right
-            -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0, 0.0f, 0.0f, // Bottom Left
-            -0.5f, 0.5f, 0.0f, 0.0, 1.0, 1.0, 1.0,  0.0f, 1.0f   // Top Left
+        // X,     Y,   Z,    R,  G,    B,   A
+        -0.5f, -0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0,
+        0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0,
+        0.0f, 0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0
     };
 
-    unsigned int indices[] = {
-            0, 1, 3,
-            1, 2, 3
-    };
-
-    unsigned int VAO, VBO, EBO;
-
-    // Generate and bind VAO
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    // Generate and bind VBO
+    unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Generate and bind EBO
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // Set vertex attributes
-    // Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
-    // Color
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
+
+    // Shader Code (now unneeded)
+
+/*
+    int success;
+    char infoLog[512];
+
+    // Create and compile vertex shader
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        printf("%s\n", infoLog);
+    }
+
+    // Create and compile fragment shader
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        printf("%s\n", infoLog);
+    }
+
+    // Create shader program and link shaders
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    glUseProgram(shaderProgram);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf("%s\n", infoLog);
+    }
+*/
+    ak::Shader triangleShader("./assets/vertexShader.vert", "./assets/fragShader.frag");
+
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Position (XYZ)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+
+    // Color (RGBA)
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // Texture Coordinates
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(7 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
-    ak::Shader characterShader("./assets/Shaders/character.vert", "./assets/Shaders/character.frag");
-    ak::Shader backgroundShader("./assets/Shaders/background.vert", "./assets/Shaders/background.frag");
-
-    ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
-    brickTexture.Bind(GL_TEXTURE0);
-    ak::Texture2D duckTexture("./assets/Textures/DuckTexture.png", GL_LINEAR, GL_REPEAT);
-    duckTexture.Bind(GL_TEXTURE1);
-    ak::Texture2D sharkTexture("./assets/Textures/shark.png", GL_LINEAR, GL_REPEAT);
-
-    glEnable(GL_BLEND);
-
-    // Render loop
+    //Render loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         float time = (float)glfwGetTime();
-        // Clear framebuffer
+        //Clear framebuffer
         glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // Drawing happens here!
+        //Drawing happens here!
+
+        triangleShader.use();
+        triangleShader.setFloat("uTime", time);
 
         glBindVertexArray(VAO);
 
-        // Draw Background
-        backgroundShader.use();
-        backgroundShader.setFloat("uTime", time);
-
-        brickTexture.Bind(GL_TEXTURE0);
-        backgroundShader.setInt("texture1", 0);
-        sharkTexture.Bind(GL_TEXTURE1);
-        backgroundShader.setInt("texture2", 1);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        // Draw Character
-        characterShader.use();
-        characterShader.setFloat("uTime", time);
-
-        duckTexture.Bind(GL_TEXTURE0);
-        characterShader.setInt("_texture", 0);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         glfwSwapBuffers(window);
     }
 
-    // Clean up resources (optional, but good practice)
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-
-    printf("Shutting down...\n");
-    glfwTerminate();
+    printf("Shutting down...");
     return 0;
 }

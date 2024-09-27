@@ -69,7 +69,11 @@ int main() {
     glEnableVertexAttribArray(2);
 
     ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
+
+    ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
+    brickTexture.Bind(GL_TEXTURE1);
     ak::Texture2D duckTexture("./assets/Textures/DuckTexture.png", GL_NEAREST, GL_REPEAT);
+    duckTexture.Bind(GL_TEXTURE0);
 
     glEnable(GL_BLEND);
 
@@ -86,7 +90,10 @@ int main() {
         triangleShader.use();
         triangleShader.setFloat("uTime", time);
 
-        duckTexture.Bind(0);
+        triangleShader.setInt("texture1", 0);
+        triangleShader.setInt("texture2", 1);
+
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);

@@ -16,8 +16,9 @@ namespace ak {
         Texture2D(const char* filePath, int filterMode, int wrapMode);
         ~Texture2D();
         void Bind(unsigned int slot = 0);
+        unsigned int getTextureSlot() const { return m_textureSlot; }
     private:
-        unsigned int m_id;
+        unsigned int m_id, m_textureSlot;
         int m_width, m_height;
     };
 

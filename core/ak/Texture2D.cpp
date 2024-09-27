@@ -30,6 +30,8 @@ namespace ak {
     }
 
     void Texture2D::Bind(unsigned int slot) {
+        glActiveTexture(slot);
         glBindTexture(GL_TEXTURE_2D, m_id);
+        m_textureSlot = slot;
     }
 } // ak

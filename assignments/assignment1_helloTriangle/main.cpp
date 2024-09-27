@@ -65,11 +65,13 @@ int main() {
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     // Texture Coordinates
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(7 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(7 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
-    ak::Texture2D duckTexture("./assets/Textures/container.png", GL_NEAREST, GL_REPEAT);
+    ak::Texture2D duckTexture("./assets/Textures/DuckTexture.png", GL_NEAREST, GL_REPEAT);
+
+    glEnable(GL_BLEND);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {

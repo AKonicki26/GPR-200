@@ -17,7 +17,9 @@ set(CORE_INC_DIR
 
 add_library(core STATIC ${CORE_SRC} ${CORE_INC}
         ak/Shader.cpp
-        ak/Shader.h)
+        ak/Shader.h
+        ak/Texture2D.cpp
+        ak/Texture2D.h)
 
 find_package(OpenGL REQUIRED)
 

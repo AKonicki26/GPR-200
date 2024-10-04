@@ -19,7 +19,9 @@ add_library(core STATIC ${CORE_SRC} ${CORE_INC}
         ak/Shader.cpp
         ak/Shader.h
         ak/Texture2D.cpp
-        ak/Texture2D.h)
+        ak/Texture2D.h
+        ak/Camera.cpp
+        ak/Camera.h)
 
 find_package(OpenGL REQUIRED)
 

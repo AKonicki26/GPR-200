@@ -4,11 +4,14 @@
 #include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "./../../core/ak/Shader.h"
 #include "ak/Texture2D.h"
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
+const float FOV = 45.0f;
 
 int main() {
     printf("Initializing...\n");
@@ -29,16 +32,52 @@ int main() {
 
     // Vertex data
     float vertices[] = {
-            // X,   Y,   Z,    R,  G,   B,    A,   TexX,  TexY
-            0.5f, 0.5f, 0.0f, 1.0, 0.0, 0.0, 1.0, 1.0f, 1.0f,   // Top Right
-            0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0, 1.0, 1.0f, 0.0f,  // Bottom Right
-            -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 1.0, 0.0f, 0.0f, // Bottom Left
-            -0.5f, 0.5f, 0.0f, 0.0, 1.0, 1.0, 1.0,  0.0f, 1.0f   // Top Left
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     unsigned int indices[] = {
-            0, 1, 3,
-            1, 2, 3
+        0, 1, 3,
+        1, 2, 3
     };
 
     unsigned int VAO, VBO, EBO;
@@ -59,33 +98,68 @@ int main() {
 
     // Set vertex attributes
     // Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    /*
     // Color
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    */
     // Texture Coordinates
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(7 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     glEnable(GL_BLEND);
+
+
+    ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
+
+    ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
+    ak::Texture2D sharkTexture("./assets/Textures/shark.png", GL_LINEAR, GL_REPEAT);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        float time = (float)glfwGetTime();
-        // Clear framebuffer
+        //Clear framebuffer
         glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // Drawing happens here!
 
         glBindVertexArray(VAO);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        triangleShader.use();
+
+        float time = (float)glfwGetTime();
+        triangleShader.setFloat("uTime", time);
+
+        brickTexture.Bind(GL_TEXTURE0);
+        triangleShader.setInt("texture1", 0);
+        sharkTexture.Bind(GL_TEXTURE1);
+        triangleShader.setInt("texture2", 1);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+
+        model = glm::rotate(model, time * glm::radians(-55.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        projection = glm::perspective(glm::radians(45.0f), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 100.0f);
+
+        unsigned int modelLoc = glGetUniformLocation(triangleShader.ID, "model");
+        unsigned int viewLoc = glGetUniformLocation(triangleShader.ID, "view");
+        unsigned int projectionLoc = glGetUniformLocation(triangleShader.ID, "projection");
+
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //Drawing happens here!
+
+
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
     }
 

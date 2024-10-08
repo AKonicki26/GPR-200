@@ -5,6 +5,8 @@
 #ifndef EWRENDER_SHADER_H
 #define EWRENDER_SHADER_H
 
+#include <glm/fwd.hpp>
+
 #include "./../../core/ew/external/glad.h"
 
 namespace ak {

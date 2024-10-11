@@ -8,6 +8,8 @@
 #include <iostream>
 #include "Shader.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace ak {
     Shader::Shader(const char *vertexPath, const char *fragmentPath) {
         // Read Shaders from file
@@ -94,4 +96,8 @@ namespace ak {
         glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
     }
 
+    void Shader::setMat4(const std::string &name, const glm::mat4 &value) const {
+        unsigned int matLoc = glGetUniformLocation(ID, name.c_str());
+        glUniformMatrix4fv(matLoc, 1, GL_FALSE, glm::value_ptr(value));
+    }
 } // ak

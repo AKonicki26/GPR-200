@@ -117,6 +117,19 @@ int main() {
     ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
     ak::Texture2D sharkTexture("./assets/Textures/shark.png", GL_LINEAR, GL_REPEAT);
 
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  -7.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -137,28 +150,33 @@ int main() {
         sharkTexture.Bind(GL_TEXTURE1);
         triangleShader.setInt("texture2", 1);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
-        glm::mat4 projection = glm::mat4(1.0f);
+        for (auto cubePos : cubePositions) {
+            glm::mat4 model = glm::mat4(1.0f);
+            glm::mat4 view = glm::mat4(1.0f);
+            glm::mat4 projection = glm::mat4(1.0f);
 
-        model = glm::rotate(model, time * glm::radians(-55.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        projection = glm::perspective(glm::radians(45.0f), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 100.0f);
+            model = glm::rotate(model, time * glm::radians(-55.0f), glm::vec3(0.5f, 1.0f, 0.0f) * cubePos);
+            view = glm::translate(view, cubePos);
+            projection = glm::perspective(glm::radians(45.0f), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 100.0f);
 
-        unsigned int modelLoc = glGetUniformLocation(triangleShader.ID, "model");
-        unsigned int viewLoc = glGetUniformLocation(triangleShader.ID, "view");
-        unsigned int projectionLoc = glGetUniformLocation(triangleShader.ID, "projection");
+            unsigned int modelLoc = glGetUniformLocation(triangleShader.ID, "model");
+            unsigned int viewLoc = glGetUniformLocation(triangleShader.ID, "view");
+            unsigned int projectionLoc = glGetUniformLocation(triangleShader.ID, "projection");
 
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+            glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+            glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
 
 
         //Drawing happens here!
 
 
 
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
     }

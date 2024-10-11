@@ -11,11 +11,9 @@ uniform float uTime;
 
 void main()
 {
-    //FragColor = Color * ((sin(2 * uTime) / 2) + 0.5) ;
-    vec4 texColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.4);
+
+    vec4 texColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);
     if (texColor.a < 0.1)
         discard;
     FragColor = texColor;
-
-    FragColor = vec4(TexCoord.x, TexCoord.y, 0.5f, 1.0f);
 }

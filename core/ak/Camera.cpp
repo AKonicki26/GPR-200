@@ -18,17 +18,25 @@ namespace ak {
     }
 
     void Camera::processKeyboardInput(float deltaTime) {
+
+        auto getKeyPressed = [&](int key) {
+            return glfwGetKey(mWindow, key) == GLFW_PRESS;
+        };
+
+        if (getKeyPressed(GLFW_KEY_ESCAPE))
+            glfwSetWindowShouldClose(mWindow, true);
+
         // Sprint function
         mSpeed = glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) ? SPRINT_SPEED : WALK_SPEED;
         mSpeed *= deltaTime;
 
-        if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
+        if (getKeyPressed(GLFW_KEY_W))
             mPosition += mSpeed * mLocalForward;
-        if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS)
+        if (getKeyPressed(GLFW_KEY_S))
             mPosition -= mSpeed * mLocalForward;
-        if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
+        if (getKeyPressed(GLFW_KEY_A))
             mPosition -= glm::normalize(glm::cross(mLocalForward, mLocalUp)) * mSpeed;
-        if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS)
+        if (getKeyPressed(GLFW_KEY_D))
             mPosition += glm::normalize(glm::cross(mLocalForward, mLocalUp)) * mSpeed;
 
 

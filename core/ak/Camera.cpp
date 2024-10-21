@@ -19,7 +19,7 @@ namespace ak {
 
     void Camera::processKeyboardInput(float deltaTime) {
 
-        auto getKeyPressed = [&](int key) {
+        auto getKeyPressed = [&](int key) -> bool {
             return glfwGetKey(mWindow, key) == GLFW_PRESS;
         };
 

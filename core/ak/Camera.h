@@ -16,6 +16,7 @@ namespace ak {
 class Camera {
 public:
     Camera();
+    Camera(GLFWwindow* window);
     explicit Camera(const glm::vec3 initialPosition) : mPosition(initialPosition) { updateLocalAngles(); }
     void Update(float deltaTime);
     void updateLocalAngles();

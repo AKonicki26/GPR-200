@@ -17,9 +17,15 @@ namespace ak {
         updateLocalAngles();
     }
 
+    Camera::Camera(GLFWwindow *window) {
+        assert(window != nullptr);
+        mWindow = window;
+        updateLocalAngles();
+    }
+
     void Camera::processKeyboardInput(float deltaTime) {
 
-        auto getKeyPressed = [&](int key) -> bool {
+        auto getKeyPressed = [&](const int key) -> bool {
             return glfwGetKey(mWindow, key) == GLFW_PRESS;
         };
 

@@ -40,6 +40,8 @@ int main() {
         return 1;
     }
 
+    camera = ak::Camera(window);
+
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -113,16 +115,20 @@ int main() {
     // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+
     /*
     // Color
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    */
+
+*/
     // Texture Coordinates
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(1);
 
     glEnable(GL_BLEND);
+    // TODO: Figure out why this doesn't do the thing
+    //glEnable(GL_DEPTH_TEST);
 
 
     ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
@@ -145,9 +151,6 @@ int main() {
 
     float lastFrameTime = 0;
     float deltaTime = 0;
-
-
-    camera.setWindow(window);
 
     glfwSetCursorPosCallback(camera.getWindow(), mouse_callback);
     glfwSetScrollCallback(camera.getWindow(), scroll_callback);

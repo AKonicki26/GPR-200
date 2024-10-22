@@ -5,6 +5,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#define CAMERA_SENSITIVITY 0.1
+#define MAX_ZOOM 1.0f
+#define MIN_ZOOM 90.0f
+
 
 
 namespace ak {
@@ -17,6 +21,10 @@ public:
     void updateLocalAngles();
     glm::mat4 getView() const;
     void setWindow(GLFWwindow* window) { mWindow = window; }
+    GLFWwindow* getWindow() const { return mWindow; }
+    void processMouseMovement(double xOffset, double yOffset);
+    void processMouseScroll(double yOffset);
+    float getZoom() const { return mZoom; }
 
 private:
     glm::vec3 mPosition = glm::vec3(0, 0, 3.0f);
@@ -27,12 +35,19 @@ private:
     glm::vec3 mLocalUp;
     glm::vec3 mLocalForward = mTarget;
 
+    double lastX, lastY = 0;
+    float mYaw = -90.0f;
+    float mPitch = 0.0f;
+    float mZoom = 45.0f;
+
     void processKeyboardInput(float deltaTime);
     void processMouseInput();
 
     GLFWwindow* mWindow;
 
     float mSpeed = 0.05f;
+
+    bool firstMouse = true;
 };
 
 } // ak

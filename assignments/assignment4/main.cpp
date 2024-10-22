@@ -14,7 +14,14 @@ const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 const float FOV = 45.0f;
 
-void mouseCallback(GLFWwindow* window, double xPos, double yPos);
+void mouse_callback( GLFWwindow* window, double xpos, double ypos);
+void scroll_callback( GLFWwindow* window, double xoffset, double yoffset);
+
+float lastX = SCREEN_WIDTH / 2.0f;
+float lastY = SCREEN_HEIGHT / 2.0f;
+bool firstMouse = true;
+
+ak::Camera camera;
 
 int main() {
     printf("Initializing...\n");
@@ -23,7 +30,7 @@ int main() {
         return 1;
     }
     GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Square", NULL, NULL);
-    if (window == NULL) {
+    if (window == nullptr) {
         printf("GLFW failed to create window\n");
         return 1;
     }
@@ -32,6 +39,7 @@ int main() {
         printf("GLAD failed to load GL headers\n");
         return 1;
     }
+
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -138,8 +146,12 @@ int main() {
     float lastFrameTime = 0;
     float deltaTime = 0;
 
-    ak::Camera camera;
+
     camera.setWindow(window);
+
+    glfwSetCursorPosCallback(camera.getWindow(), mouse_callback);
+    glfwSetScrollCallback(camera.getWindow(), scroll_callback);
+
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -169,7 +181,7 @@ int main() {
         triangleShader.setMat4("view", view);
 
         glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(camera.getZoom()), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 100.0f);
         triangleShader.setMat4("projection", projection);
 
         for (int i = 0; i < std::end(cubePositions) - std::begin(cubePositions); ++i) {
@@ -180,15 +192,6 @@ int main() {
             triangleShader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-
-
-
-        //Drawing happens here!
-
-
-
-
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
     }
 
@@ -200,4 +203,33 @@ int main() {
     printf("Shutting down...\n");
     glfwTerminate();
     return 0;
+}
+
+// Stolen directly from the Camera class version of the code documentation
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.processMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.processMouseScroll(static_cast<float>(yoffset));
 }

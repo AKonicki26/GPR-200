@@ -7,7 +7,7 @@
 
 #define CAMERA_SENSITIVITY 0.1
 #define MAX_ZOOM 1.0f
-#define MIN_ZOOM 90.0f
+#define MIN_ZOOM 120.0f
 
 
 
@@ -38,7 +38,7 @@ private:
     double lastX, lastY = 0;
     float mYaw = -90.0f;
     float mPitch = 0.0f;
-    float mZoom = 45.0f;
+    float mZoom = 60.0f;
 
     void processKeyboardInput(float deltaTime);
     void processMouseInput();

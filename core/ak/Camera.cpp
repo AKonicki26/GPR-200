@@ -38,8 +38,10 @@ namespace ak {
             mPosition -= glm::normalize(glm::cross(mLocalForward, mLocalUp)) * mSpeed;
         if (getKeyPressed(GLFW_KEY_D))
             mPosition += glm::normalize(glm::cross(mLocalForward, mLocalUp)) * mSpeed;
-
-
+        if (getKeyPressed(GLFW_KEY_E))
+            mPosition.y += mSpeed;
+        if (getKeyPressed(GLFW_KEY_Q))
+            mPosition.y -= mSpeed;
     }
 
     void Camera::Update(float deltaTime) {

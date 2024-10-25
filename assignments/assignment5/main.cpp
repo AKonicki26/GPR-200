@@ -10,6 +10,8 @@
 #include "ak/Camera.h"
 #include "ak/Texture2D.h"
 #include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #define NUMBER_OF_CUBES 300
 
@@ -42,6 +44,11 @@ int main() {
         printf("GLAD failed to load GL headers\n");
         return 1;
     }
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     camera = ak::Camera(window);
 

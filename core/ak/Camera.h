@@ -41,8 +41,10 @@ private:
     float mPitch = 0.0f;
     float mZoom = 60.0f;
 
+    bool mPanning = false;
+
     void processKeyboardInput(float deltaTime);
-    void processMouseInput();
+    void processMouseInput(float deltaTime);
 
     GLFWwindow* mWindow;
 

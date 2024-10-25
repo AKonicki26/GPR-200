@@ -33,7 +33,7 @@ namespace ak {
             glfwSetWindowShouldClose(mWindow, true);
 
         // Sprint function
-        mSpeed = glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) ? SPRINT_SPEED : WALK_SPEED;
+        mSpeed = getKeyPressed(GLFW_KEY_LEFT_SHIFT) ? SPRINT_SPEED : WALK_SPEED;
         mSpeed *= deltaTime;
 
         if (getKeyPressed(GLFW_KEY_W))
@@ -50,8 +50,18 @@ namespace ak {
             mPosition.y -= mSpeed;
     }
 
+    void Camera::processMouseInput(float deltaTime) {
+        auto getMouseButtonPressed = [&](const int button) -> bool {
+            return glfwGetMouseButton(mWindow, button) == GLFW_PRESS;
+        };
+
+        mPanning = getMouseButtonPressed(GLFW_MOUSE_BUTTON_2);
+        glfwSetInputMode(mWindow, GLFW_CURSOR, mPanning ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    }
+
     void Camera::Update(float deltaTime) {
         processKeyboardInput(deltaTime);
+        processMouseInput(deltaTime);
     }
 
     void Camera::updateLocalAngles() {
@@ -70,6 +80,10 @@ namespace ak {
     }
 
     void Camera::processMouseMovement(double xOffset, double yOffset) {
+        // Don't do anything if we're not supposed to
+        if (!mPanning)
+            return;
+
         xOffset *= CAMERA_SENSITIVITY;
         yOffset *= CAMERA_SENSITIVITY;
         mYaw += xOffset;
@@ -79,6 +93,7 @@ namespace ak {
             mPitch = 89.0f;
         if (mPitch < -89.0f)
             mPitch = -89.0f;
+
 
         // update Front, Right and Up Vectors using the updated Euler angles
         updateLocalAngles();

@@ -23,6 +23,12 @@ include(external/imgui.cmake)
 include(external/glm.cmake)
 
 add_subdirectory(core)
-add_subdirectory(assignments/assignment1_helloTriangle)
-add_subdirectory(assignments/assignment2)
-add_subdirectory(assignments/assignment4)
+
+file(GLOB SRC_DIRS "assignments/*")
+
+# Include all folders in the assignments folder
+foreach(dir ${SRC_DIRS})
+  if(IS_DIRECTORY ${dir})
+    add_subdirectory(${dir})
+  endif()
+endforeach ()

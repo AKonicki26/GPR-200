@@ -127,6 +127,7 @@ int main() {
     glEnableVertexAttribArray(1);
 
     glEnable(GL_BLEND);
+    // TODO: Figure out why this doesn't do the thing
     glEnable(GL_DEPTH_TEST);
 
 

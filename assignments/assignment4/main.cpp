@@ -128,7 +128,7 @@ int main() {
 
     glEnable(GL_BLEND);
     // TODO: Figure out why this doesn't do the thing
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
 
     ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
@@ -163,6 +163,7 @@ int main() {
         //Clear framebuffer
         glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         glBindVertexArray(VAO);
 

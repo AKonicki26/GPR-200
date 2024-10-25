@@ -9,6 +9,9 @@
 #include "./../../core/ak/Shader.h"
 #include "ak/Camera.h"
 #include "ak/Texture2D.h"
+#include <imgui.h>
+
+#define NUMBER_OF_CUBES 300
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
@@ -127,7 +130,6 @@ int main() {
     glEnableVertexAttribArray(1);
 
     glEnable(GL_BLEND);
-    // TODO: Figure out why this doesn't do the thing
     glEnable(GL_DEPTH_TEST);
 
 
@@ -136,18 +138,17 @@ int main() {
     ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
     ak::Texture2D sharkTexture("./assets/Textures/shark.png", GL_LINEAR, GL_REPEAT);
 
-    glm::vec3 cubePositions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    auto getRandomCubePosition = [&gen](float minPos, float maxPos) -> glm::vec3 {
+        std::uniform_real_distribution<float> dist(minPos, maxPos);
+        return glm::vec3(dist(gen), dist(gen), dist(gen));
     };
+
+    glm::vec3 cubePositions[NUMBER_OF_CUBES];
+    for (int i = 0; i < NUMBER_OF_CUBES; i++) {
+        cubePositions[i] = getRandomCubePosition(-2,15);
+    }
 
     float lastFrameTime = 0;
     float deltaTime = 0;

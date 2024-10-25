@@ -9,8 +9,8 @@
 
 #include "GLFW/glfw3.h"
 
-#define SPRINT_SPEED 0.65f
-#define WALK_SPEED 0.25f
+#define SPRINT_SPEED 1.5f
+#define WALK_SPEED 0.75f
 
 namespace ak {
     Camera::Camera() {

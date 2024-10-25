@@ -171,28 +171,28 @@ int main() {
         auto time = (float)glfwGetTime();
         deltaTime = time - lastFrameTime;
         lastFrameTime = time;
-        triangleShader.setFloat("uTime", time);
+        triangleShader.setValue("uTime", time);
 
         brickTexture.Bind(GL_TEXTURE0);
-        triangleShader.setInt("texture1", 0);
+        triangleShader.setValue("texture1", 0);
         sharkTexture.Bind(GL_TEXTURE1);
-        triangleShader.setInt("texture2", 1);
+        triangleShader.setValue("texture2", 1);
 
         camera.Update(deltaTime);
 
         glm::mat4 view = camera.getView();
-        triangleShader.setMat4("view", view);
+        triangleShader.setValue("view", view);
 
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(camera.getZoom()), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 1000.0f);
-        triangleShader.setMat4("projection", projection);
+        triangleShader.setValue("projection", projection);
 
         for (int i = 0; i < std::end(cubePositions) - std::begin(cubePositions); ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            triangleShader.setMat4("model", model);
+            triangleShader.setValue("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glfwSwapBuffers(window);

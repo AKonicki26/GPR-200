@@ -93,20 +93,20 @@ int main() {
 
         // Draw Background
         backgroundShader.use();
-        backgroundShader.setFloat("uTime", time);
+        backgroundShader.setValue("uTime", time);
 
         brickTexture.Bind(GL_TEXTURE0);
-        backgroundShader.setInt("texture1", 0);
+        backgroundShader.setValue("texture1", 0);
         sharkTexture.Bind(GL_TEXTURE1);
-        backgroundShader.setInt("texture2", 1);
+        backgroundShader.setValue("texture2", 1);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // Draw Character
         characterShader.use();
-        characterShader.setFloat("uTime", time);
+        characterShader.setValue("uTime", time);
 
         duckTexture.Bind(GL_TEXTURE0);
-        characterShader.setInt("_texture", 0);
+        characterShader.setValue("_texture", 0);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);

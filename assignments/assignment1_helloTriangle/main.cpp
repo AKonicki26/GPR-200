@@ -148,7 +148,7 @@ int main() {
         //Drawing happens here!
 
         triangleShader.use();
-        triangleShader.setFloat("uTime", time);
+        triangleShader.setValue("uTime", time);
 
         glBindVertexArray(VAO);
 

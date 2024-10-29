@@ -130,7 +130,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
 
-    ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
+    ak::Shader basicCubeShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
 
     ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
     ak::Texture2D sharkTexture("./assets/Textures/shark.png", GL_LINEAR, GL_REPEAT);
@@ -166,33 +166,33 @@ int main() {
 
         glBindVertexArray(VAO);
 
-        triangleShader.use();
+        basicCubeShader.use();
 
         auto time = (float)glfwGetTime();
         deltaTime = time - lastFrameTime;
         lastFrameTime = time;
-        triangleShader.setValue("uTime", time);
+        basicCubeShader.setValue("uTime", time);
 
         brickTexture.Bind(GL_TEXTURE0);
-        triangleShader.setValue("texture1", 0);
+        basicCubeShader.setValue("texture1", 0);
         sharkTexture.Bind(GL_TEXTURE1);
-        triangleShader.setValue("texture2", 1);
+        basicCubeShader.setValue("texture2", 1);
 
         camera.Update(deltaTime);
 
         glm::mat4 view = camera.getView();
-        triangleShader.setValue("view", view);
+        basicCubeShader.setValue("view", view);
 
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(camera.getZoom()), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 1000.0f);
-        triangleShader.setValue("projection", projection);
+        basicCubeShader.setValue("projection", projection);
 
         for (int i = 0; i < std::end(cubePositions) - std::begin(cubePositions); ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            triangleShader.setValue("model", model);
+            basicCubeShader.setValue("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glfwSwapBuffers(window);

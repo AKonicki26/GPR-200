@@ -13,7 +13,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#define NUMBER_OF_CUBES 300
+#define NUMBER_OF_CUBES 12
+
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
@@ -28,7 +29,25 @@ bool firstMouse = true;
 
 ak::Camera camera;
 
+glm::vec3 lightPos = glm::vec3(0.0f, 0.5f, 0.0f);
+glm::vec3 lightColor;
+float ambientLight = 0.5;
+float diffuseLight = 0.25;
+float specularLight = 0.75;
+float shininess = 34;
+
+#define MIN_SHININESS 2
+#define MAX_SHININESS 1024
+
+void renderUiWindows();
+
+const std::string ASSETS_PATH = "./assets/";
+const std::string SHADER_PATH = ASSETS_PATH + "Shaders/";
+const std::string TEXTURE_PATH = ASSETS_PATH + "Textures/";
+
 int main() {
+    assert(NUMBER_OF_CUBES > 0);
+    assert((int)NUMBER_OF_CUBES == NUMBER_OF_CUBES);
     printf("Initializing...\n");
     if (!glfwInit()) {
         printf("GLFW failed to init!\n");
@@ -51,7 +70,6 @@ int main() {
     ImGui_ImplOpenGL3_Init();
 
     camera = ak::Camera(window);
-
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -140,7 +158,8 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
 
-    ak::Shader triangleShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
+    ak::Shader basicCubeShader("./assets/Shaders/vertexShader.vert", "./assets/Shaders/fragShader.frag");
+    ak::Shader lightShader((SHADER_PATH + "lightShader.vert.glsl").c_str(), (SHADER_PATH + "fragShader.frag.glsl").c_str());
 
     ak::Texture2D brickTexture("./assets/Textures/Bricks.png", GL_NEAREST, GL_REPEAT);
     ak::Texture2D sharkTexture("./assets/Textures/shark.png", GL_LINEAR, GL_REPEAT);
@@ -154,7 +173,7 @@ int main() {
 
     glm::vec3 cubePositions[NUMBER_OF_CUBES];
     for (int i = 0; i < NUMBER_OF_CUBES; i++) {
-        cubePositions[i] = getRandomCubePosition(-2,15);
+        cubePositions[i] = getRandomCubePosition(-2,8);
     }
 
     float lastFrameTime = 0;
@@ -163,10 +182,11 @@ int main() {
     glfwSetCursorPosCallback(camera.getWindow(), mouse_callback);
     glfwSetScrollCallback(camera.getWindow(), scroll_callback);
 
-
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
+
+        cubePositions[0] = lightPos;
 
         //Clear framebuffer
         glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
@@ -175,35 +195,56 @@ int main() {
 
         glBindVertexArray(VAO);
 
-        triangleShader.use();
-
         auto time = (float)glfwGetTime();
         deltaTime = time - lastFrameTime;
         lastFrameTime = time;
-        triangleShader.setValue("uTime", time);
-
-        brickTexture.Bind(GL_TEXTURE0);
-        triangleShader.setValue("texture1", 0);
-        sharkTexture.Bind(GL_TEXTURE1);
-        triangleShader.setValue("texture2", 1);
 
         camera.Update(deltaTime);
 
         glm::mat4 view = camera.getView();
-        triangleShader.setValue("view", view);
 
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(camera.getZoom()), float(SCREEN_WIDTH) / float(SCREEN_HEIGHT), 0.1f, 1000.0f);
-        triangleShader.setValue("projection", projection);
 
-        for (int i = 0; i < std::end(cubePositions) - std::begin(cubePositions); ++i) {
+        // Draw the light source cube
+        lightShader.use();
+
+        lightShader.setValue("view", view);
+        lightShader.setValue("uTime", time);
+        lightShader.setValue("projection", projection);
+
+        lightShader.setValue("ambientStrength", ambientLight);
+        lightShader.setValue("diffuseStrength", diffuseLight);
+        lightShader.setValue("specularStrength", specularLight);
+
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), lightPos);
+        model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        lightShader.setValue("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // Draw the rest of the cubes
+        basicCubeShader.use();
+
+        brickTexture.Bind(GL_TEXTURE0);
+        basicCubeShader.setValue("texture1", 0);
+        sharkTexture.Bind(GL_TEXTURE1);
+        basicCubeShader.setValue("texture2", 1);
+
+        basicCubeShader.setValue("view", view);
+        basicCubeShader.setValue("uTime", time);
+        basicCubeShader.setValue("projection", projection);
+
+        for (int i = 1; i < std::end(cubePositions) - std::begin(cubePositions); ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            triangleShader.setValue("model", model);
+            basicCubeShader.setValue("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+        renderUiWindows();
+
         glfwSwapBuffers(window);
     }
 
@@ -244,4 +285,24 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.processMouseScroll(static_cast<float>(yoffset));
+}
+
+void renderUiWindows() {
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("Settings");
+
+    ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
+    ImGui::ColorEdit3("Light Color", &lightColor.r);
+    ImGui::SliderFloat("Ambient", &ambientLight, 0.0f, 1.0f);
+    ImGui::SliderFloat("Diffuse", &diffuseLight, 0.0f, 1.0f);
+    ImGui::SliderFloat("Specular", &specularLight, 0.0f, 1.0f);
+    ImGui::SliderFloat("Shininess", &shininess, MIN_SHININESS, MAX_SHININESS);
+
+    ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

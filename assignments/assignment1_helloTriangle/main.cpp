@@ -103,7 +103,7 @@ int main() {
         printf("%s\n", infoLog);
     }
 
-    // Create shader program and link shaders
+    // Create shader program and link Shaders
     unsigned int shaderProgram;
     shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);

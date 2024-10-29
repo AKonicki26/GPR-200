@@ -23,6 +23,13 @@ namespace ak {
         updateLocalAngles();
     }
 
+    Camera::Camera(GLFWwindow *window, const glm::vec3 initialPosition) : mPosition(initialPosition) {
+        assert(window != nullptr);
+        mWindow = window;
+        updateLocalAngles();
+    }
+
+
     void Camera::processKeyboardInput(float deltaTime) {
 
         auto getKeyPressed = [&](const int key) -> bool {

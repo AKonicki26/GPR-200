@@ -17,7 +17,7 @@ class Camera {
 public:
     Camera();
     Camera(GLFWwindow* window);
-    explicit Camera(const glm::vec3 initialPosition) : mPosition(initialPosition) { updateLocalAngles(); }
+    Camera(GLFWwindow* window, const glm::vec3 initialPosition);
     void Update(float deltaTime);
     void updateLocalAngles();
     glm::mat4 getView() const;
